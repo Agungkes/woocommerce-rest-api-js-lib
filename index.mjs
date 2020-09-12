@@ -1,9 +1,9 @@
 "use strict";
 
 import axios from "axios";
-import createHmac from "create-hmac";
 import OAuth from "oauth-1.0a";
 import Url from "url-parse";
+import CryptoJS from "crypto-js";
 
 /**
  * WooCommerce REST API wrapper
@@ -37,6 +37,16 @@ export default class WooCommerceRestApi {
 
     this.classVersion = "1.0.1";
     this._setDefaultsOptions(opt);
+  }
+
+  /**
+   * Create Hmac using Crypto JS for React Native
+   *
+   * @param base string
+   * @param key string
+   */
+  _createHmac(base, key) {
+    return CryptoJS.HmacSHA256(base, key).toString(CryptoJS.enc.Base64);
   }
 
   /**
@@ -165,9 +175,7 @@ export default class WooCommerceRestApi {
       },
       signature_method: "HMAC-SHA256",
       hash_function: (base, key) => {
-        return createHmac("sha256", key)
-          .update(base)
-          .digest("base64");
+        return this._createHmac(base, key);
       }
     };
 
